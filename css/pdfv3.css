@@ -1,0 +1,235 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    /* Ensure body takes full viewport height */
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+aside {
+    width: 300px;
+    /* Slightly reduced width for sidebar */
+    background: #282828;
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-sizing: border-box;
+    border-right: 1px solid #3a3a3a;
+    flex-shrink: 0;
+    /* Prevent shrinking on smaller screens */
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    color: #e0e0e0;
+    align-items: flex-start;
+    border-bottom: 1px solid #3a3a3a;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.toolbar>div {
+    width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #bbbbbb;
+}
+
+input[type="file"] {
+    font-size: 12px;
+    background-color: #3a3a3a;
+    color: white;
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+input[type="file"]:hover {
+    background-color: #4a4a4a;
+    border-color: #777;
+}
+
+audio {
+    width: 100%;
+    height: 40px;
+    border-radius: 5px;
+    background: #3a3a3a;
+}
+
+.playlist {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 200px;
+    background: #3a3a3a;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 13px;
+    border: 1px solid #444;
+    min-height: 80px;
+}
+
+.playlist div {
+    cursor: pointer;
+    padding: 8px 5px;
+    border-bottom: 1px solid #444;
+    transition: background 0.2s, color 0.2s;
+}
+
+.playlist div:last-child {
+    border-bottom: none;
+}
+
+.playlist div:hover {
+    background: #4a4a4a;
+    border-radius: 3px;
+}
+
+.playlist .active-audio {
+    background: #ffb14c;
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.search-container {
+    display: flex;
+    gap: 5px;
+    width: 100%;
+}
+
+#search-input {
+    flex: 1;
+    background: #3a3a3a;
+    border: 1px solid #555;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    font-size: 13px;
+}
+
+#search-input:focus {
+    border-color: #ffb14c;
+}
+
+.search-container button {
+    background: #3a3a3a;
+    border: 1px solid #555;
+    color: #bbbbbb;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.search-container button:hover {
+    background-color: #4a4a4a;
+    color: white;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f0f2f5;
+}
+
+#pdf-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+    flex: 1;
+}
+
+/* Basic Responsiveness for PC/Laptop */
+@media (max-width: 1200px) {
+    aside {
+        width: 300px;
+        /* Slightly smaller sidebar on medium screens */
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+        /* Stack sidebar and main content vertically */
+    }
+
+    aside {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #3a3a3a;
+        height: auto;
+    }
+
+    .toolbar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        border-bottom: none;
+    }
+
+    .toolbar>div {
+        width: 48%;
+    }
+
+    audio {
+        width: 98%;
+    }
+
+    .playlist {
+        max-height: 150px;
+    }
+
+    .main-content {
+        height: 70vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .toolbar>div {
+        width: 95%;
+    }
+
+    audio {
+        width: 95%;
+    }
+}
