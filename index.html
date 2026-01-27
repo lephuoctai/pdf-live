@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TL Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/global.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>BẢNG ĐIỀU KHIỂN</h1>
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="Tìm kiếm tiện ích...">
+            </div>
+        </header>
+
+        <div id="pinned-section" class="hidden">
+            <h2 class="section-title">Đã ghim</h2>
+            <div id="pinned-grid" class="grid"></div>
+        </div>
+
+        <div id="all-section">
+            <h2 class="section-title">Tất cả tiện ích</h2>
+            <div id="all-grid" class="grid"></div>
+        </div>
+    </div>
+    <div class="footer">
+        <span>Phiên bản 3.2.0 &copy; tl-utils.vercel.app</span>
+    </div>
+
+    <script src="./js/dashboard.js"></script>
+</body>
+</html>
