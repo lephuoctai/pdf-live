@@ -19,7 +19,6 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     height: 100vh;
-    /* Ensure body takes full viewport height */
 }
 
 .container {
@@ -29,7 +28,6 @@ body {
 
 aside {
     width: 300px;
-    /* Slightly reduced width for sidebar */
     background: #282828;
     color: white;
     padding: 15px;
@@ -39,7 +37,6 @@ aside {
     box-sizing: border-box;
     border-right: 1px solid #3a3a3a;
     flex-shrink: 0;
-    /* Prevent shrinking on smaller screens */
 }
 
 .toolbar {
@@ -179,18 +176,15 @@ audio {
     flex: 1;
 }
 
-/* Basic Responsiveness for PC/Laptop */
 @media (max-width: 1200px) {
     aside {
         width: 300px;
-        /* Slightly smaller sidebar on medium screens */
     }
 }
 
 @media (max-width: 992px) {
     .container {
         flex-direction: column;
-        /* Stack sidebar and main content vertically */
     }
 
     aside {

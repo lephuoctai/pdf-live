@@ -5,6 +5,7 @@ const pdfViewer = document.getElementById('pdf-viewer');
 const audioPlayer = document.getElementById('audio-player');
 const playlistDiv = document.getElementById('playlist');
 const searchInput = document.getElementById('search-input');
+const locateBtn = document.getElementById('locate-btn');
 const clearBtn = document.getElementById('clear-btn');
 
 // Xử lý chọn PDF
@@ -53,6 +54,16 @@ audioInput.onchange = (e) => {
 
 searchInput.oninput = () => {
     renderPlaylist(searchInput.value);
+};
+
+locateBtn.onclick = () => {
+    if (currentAudioIndex === -1) return;
+    searchInput.value = "";
+    renderPlaylist("");
+    const activeItem = playlistDiv.querySelector('.active-audio');
+    if (activeItem) {
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 };
 
 clearBtn.onclick = () => {
