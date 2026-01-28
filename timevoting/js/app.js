@@ -320,12 +320,17 @@ initApp();
 function toggleViewMode() {
     viewOnlyMode = !viewOnlyMode;
     const modeBtn = document.getElementById('mode-btn');
+    const modeIcon = modeBtn.querySelector('i');
     if (viewOnlyMode) {
         modeBtn.classList.add('btn-primary');
-        modeBtn.innerHTML = '<i class="fas fa-eye"></i> Chế độ: Xem';
+        modeIcon.classList.remove('fa-eye-slash');
+        modeIcon.classList.add('fa-eye');
+        modeBtn.title = 'Bật chế độ xem';
     } else {
         modeBtn.classList.remove('btn-primary');
-        modeBtn.innerHTML = '<i class="fas fa-edit"></i> Chế độ: Bình chọn';
+        modeIcon.classList.remove('fa-eye');
+        modeIcon.classList.add('fa-eye-slash');
+        modeBtn.title = 'Tắt chế độ xem';
     }
     renderTable();
     updateVoterList();
