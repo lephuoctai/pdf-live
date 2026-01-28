@@ -44,6 +44,22 @@ aside {
     margin-bottom: 5px;
 }
 
+.search-input {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+}
+
 .timer {
     font-size: 2rem;
     font-weight: bold;

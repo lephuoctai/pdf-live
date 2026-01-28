@@ -141,14 +141,23 @@ function handleCellClick(slotId) {
 
 function updateVoterList() {
     const listDiv = document.getElementById('voter-list');
+    const searchInput = document.getElementById('voter-search');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
     if (!selectedSlot) {
-        listDiv.innerHTML = 'Chọn một ô để xem danh sách...';
+        listDiv.innerHTML = 'Vui lòng chọn khung giờ!';
         return;
     }
 
-    const votes = currentRoomData.votes[selectedSlot] || [];
+    let votes = currentRoomData.votes[selectedSlot] || [];
+    
+    // Lọc theo từ khóa tìm kiếm
+    if (searchTerm) {
+        votes = votes.filter(name => name.toLowerCase().includes(searchTerm));
+    }
+
     if (votes.length === 0) {
-        listDiv.innerHTML = 'Chưa có ai chọn ô này.';
+        listDiv.innerHTML = searchTerm ? 'Không tìm thấy người này.' : 'Chưa có ai chọn ô này.';
     } else {
         listDiv.innerHTML = votes.map(name => `<div class="voter-item">${name}</div>`).join('');
     }
@@ -166,12 +175,14 @@ function updateCountdown() {
         return;
     }
 
-    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(diff / (24 * 3600000));
+    const h = Math.floor((diff % (24 * 3600000)) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
 
+    const dayText = d > 0 ? `${d} ngày ` : '';
     document.getElementById('countdown').innerText =
-        `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        `${dayText}${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
 // --- ACTIONS ---
@@ -296,6 +307,11 @@ document.getElementById('extend-btn').onclick = handleExtend;
 document.getElementById('delete-btn').onclick = handleDelete;
 document.getElementById('share-btn').onclick = showShareModal;
 
+// Lắng nghe sự kiện tìm kiếm
+if (document.getElementById('voter-search')) {
+    document.getElementById('voter-search').oninput = updateVoterList;
+}
+
 // Kiểm tra sự tồn tại của các nút trước khi gán sự kiện
 if (document.getElementById('join-btn')) {
     document.getElementById('join-btn').onclick = handleJoinById;
@@ -317,6 +333,7 @@ if (document.getElementById('entry-modal')) {
 // Khởi chạy
 initApp();
 
+// Chế độ xem chỉ đọc
 function toggleViewMode() {
     viewOnlyMode = !viewOnlyMode;
     const modeBtn = document.getElementById('mode-btn');
