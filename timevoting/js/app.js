@@ -12,25 +12,31 @@ const firebaseConfig = {
     messagingSenderId: "146946980379",
     appId: "1:146946980379:web:d31e96f0871cd1f18156be",
     measurementId: "G-7CRM65YPJJ"
-  };
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 // --- BIẾN TOÀN CỤC ---
 let roomId = new URLSearchParams(window.location.search).get('id');
 let currentRoomData = null;
 let userName = localStorage.getItem('userName');
 let selectedSlot = null;
+let shareModal = null;
+let viewOnlyMode = false; // Chế độ xem chỉ đọc
 
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7); // 07:00 to 22:00
 
 // --- KHỞI TẠO APP ---
 async function initApp() {
+    // Nếu không có roomId, hiển thị modal tạo hoặc tham gia
     if (!roomId) {
-        showModal('create-modal');
+        showModal('entry-modal');
         return;
+    } else {
+        hideModal('entry-modal');
     }
 
     const roomRef = doc(db, "rooms", roomId);
@@ -43,7 +49,6 @@ async function initApp() {
     }
 
     const data = docSnap.data();
-    
     // Kiểm tra hết hạn (Auto-cleanup)
     const now = Date.now();
     if (data.expireAt.toMillis() < now) {
@@ -55,11 +60,16 @@ async function initApp() {
 
     currentRoomData = data;
     document.getElementById('event-title').innerText = data.title;
-    
+
     // Yêu cầu nhập tên nếu chưa có
     if (!userName) {
         showModal('name-modal');
     }
+    else {
+        // Hiển thị modal chia sẻ link để nhắc người dùng lưu lại
+        showShareModal();
+    }
+
 
     // Lắng nghe thay đổi real-time
     onSnapshot(roomRef, (snapshot) => {
@@ -81,7 +91,7 @@ function renderTable() {
 
     HOURS.forEach(hour => {
         const row = document.createElement('tr');
-        
+
         // Cột giờ
         const hourCell = document.createElement('td');
         hourCell.innerText = `${hour.toString().padStart(2, '0')}:00`;
@@ -92,11 +102,12 @@ function renderTable() {
             const slotId = `${day}-${hour.toString().padStart(2, '0')}00`;
             const votes = currentRoomData.votes[slotId] || [];
             const isVoted = userName && votes.includes(userName);
-            
+
             const cell = document.createElement('td');
             cell.id = slotId;
             if (isVoted) cell.classList.add('voted');
             if (selectedSlot === slotId) cell.classList.add('active-cell');
+            if (viewOnlyMode) cell.classList.add('view-only-mode');
 
             cell.innerHTML = `
                 <div class="cell-count">${votes.length > 0 ? votes.length : ''}</div>
@@ -116,11 +127,11 @@ function handleCellClick(slotId) {
     renderTable(); // Update active-cell class
     updateVoterList();
 
-    if (!userName) return; // View only mode
+    if (!userName || viewOnlyMode) return; // View only mode
 
     const roomRef = doc(db, "rooms", roomId);
     const votes = currentRoomData.votes[slotId] || [];
-    
+
     if (votes.includes(userName)) {
         updateDoc(roomRef, { [`votes.${slotId}`]: arrayRemove(userName) });
     } else {
@@ -145,7 +156,7 @@ function updateVoterList() {
 
 function updateCountdown() {
     if (!currentRoomData) return;
-    
+
     const now = Date.now();
     const expire = currentRoomData.expireAt.toMillis();
     const diff = expire - now;
@@ -158,24 +169,36 @@ function updateCountdown() {
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    
-    document.getElementById('countdown').innerText = 
+
+    document.getElementById('countdown').innerText =
         `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
 // --- ACTIONS ---
 async function handleCreateEvent() {
     const title = document.getElementById('new-event-name').value.trim();
+    const dateInput = document.getElementById('event-expire-date').value;
     if (!title) return alert("Vui lòng nhập tên sự kiện.");
+    if (!dateInput) return alert("Vui lòng chọn ngày xoá sự kiện.");
+
+    const expireDate = new Date(dateInput);
+    const now = Date.now();
+    const maxExpire = now + 31 * 24 * 60 * 60 * 1000;
+    if (expireDate.getTime() > maxExpire) {
+        alert("Ngày xoá không được quá 1 tháng kể từ hôm nay.");
+        return;
+    }
+    if (expireDate.getTime() < now) {
+        alert("Ngày xoá phải lớn hơn hiện tại.");
+        return;
+    }
 
     const newId = Math.random().toString(36).substring(2, 15);
-    const now = Date.now();
-    
     const newRoom = {
         id: newId,
         title: title,
         createdAt: Timestamp.fromMillis(now),
-        expireAt: Timestamp.fromMillis(now + 48 * 60 * 60 * 1000), // 48h
+        expireAt: Timestamp.fromMillis(expireDate.getTime()),
         votes: {}
     };
 
@@ -185,22 +208,18 @@ async function handleCreateEvent() {
 
 async function handleExtend() {
     if (!currentRoomData) return;
-    
     const createdAt = currentRoomData.createdAt.toMillis();
     const currentExpire = currentRoomData.expireAt.toMillis();
-    const maxLimit = createdAt + 90 * 24 * 60 * 60 * 1000; // 90 days hard limit
-
-    const newExpire = currentExpire + 24 * 60 * 60 * 1000; // +24h
-
+    const maxLimit = createdAt + 31 * 24 * 60 * 60 * 1000; // 1 tháng
+    const newExpire = currentExpire + 7 * 24 * 60 * 60 * 1000; // +1 tuần
     if (newExpire > maxLimit) {
-        alert("Đã đạt giới hạn gia hạn tối đa (3 tháng).");
+        alert("Không thể gia hạn quá 1 tháng kể từ ngày tạo.");
         return;
     }
-
     await updateDoc(doc(db, "rooms", roomId), {
         expireAt: Timestamp.fromMillis(newExpire)
     });
-    alert("Đã gia hạn thêm 24 giờ!");
+    alert("Đã gia hạn thêm 1 tuần!");
 }
 
 async function handleDelete() {
@@ -219,9 +238,50 @@ function hideModal(id) {
     document.getElementById(id).classList.add('hidden');
 }
 
+// --- SHARE LINK ---
+function showShareModal() {
+    if (!roomId) return;
+    let modal = document.getElementById('share-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'share-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>Chia sẻ sự kiện</h2>
+                <p style="margin-bottom:10px;">Vui lòng lưu lại <span class="highlight">ID hoặc link</span> <br>để chia sẻ vote và xem lại.</p>
+                <div style="margin-bottom:10px;">ID: <b>${roomId}</b></div>
+                <input id="share-link-input" style="width:100%;padding:8px;" readonly value="${window.location.origin + window.location.pathname}?id=${roomId}">
+                <button id="copy-link-btn" class="btn btn-primary" style="margin:15px 0 0 0;"><i class="fas fa-copy"></i> Sao chép link</button>
+                <button id="close-share-btn" class="btn" style="margin-top:10px;"><i class="fas fa-times"></i> Đóng</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('copy-link-btn').onclick = function () {
+            const input = document.getElementById('share-link-input');
+            input.select();
+            document.execCommand('copy');
+            this.innerText = 'Đã sao chép!';
+            setTimeout(() => { this.innerText = 'Sao chép link'; }, 1500);
+        };
+        document.getElementById('close-share-btn').onclick = function () {
+            modal.classList.add('hidden');
+        };
+    } else {
+        modal.classList.remove('hidden');
+    }
+}
+
+// --- JOIN BY ID ---
+function handleJoinById() {
+    const input = document.getElementById('join-id-input');
+    const id = input.value.trim();
+    if (!id) return alert('Vui lòng nhập ID sự kiện!');
+    window.location.search = `?id=${id}`;
+}
+
 // --- EVENT LISTENERS ---
 document.getElementById('confirm-create').onclick = handleCreateEvent;
-
 document.getElementById('confirm-name').onclick = () => {
     const name = document.getElementById('user-name-input').value.trim();
     if (name) {
@@ -231,11 +291,44 @@ document.getElementById('confirm-name').onclick = () => {
         renderTable();
     }
 };
-
 document.getElementById('skip-name').onclick = () => hideModal('name-modal');
-
 document.getElementById('extend-btn').onclick = handleExtend;
 document.getElementById('delete-btn').onclick = handleDelete;
+document.getElementById('share-btn').onclick = showShareModal;
+
+// Kiểm tra sự tồn tại của các nút trước khi gán sự kiện
+if (document.getElementById('join-btn')) {
+    document.getElementById('join-btn').onclick = handleJoinById;
+}
+if (document.getElementById('show-create-btn')) {
+    document.getElementById('show-create-btn').onclick = () => {
+        hideModal('entry-modal');
+        showModal('create-modal');
+    };
+}
+
+// Khi đóng/tạo xong event, ẩn modal entry nếu có
+if (document.getElementById('entry-modal')) {
+    document.getElementById('entry-modal').addEventListener('click', function (e) {
+        if (e.target === this) this.classList.add('hidden');
+    });
+}
 
 // Khởi chạy
 initApp();
+
+function toggleViewMode() {
+    viewOnlyMode = !viewOnlyMode;
+    const modeBtn = document.getElementById('mode-btn');
+    if (viewOnlyMode) {
+        modeBtn.classList.add('btn-primary');
+        modeBtn.innerHTML = '<i class="fas fa-eye"></i> Chế độ: Xem';
+    } else {
+        modeBtn.classList.remove('btn-primary');
+        modeBtn.innerHTML = '<i class="fas fa-edit"></i> Chế độ: Bình chọn';
+    }
+    renderTable();
+    updateVoterList();
+}
+
+document.getElementById('mode-btn').onclick = toggleViewMode;

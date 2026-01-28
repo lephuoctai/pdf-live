@@ -96,7 +96,6 @@ aside {
     border-radius: 6px;
     padding: 10px;
     min-height: 100px;
-    font-size: 0.9rem;
     max-height: 300px;
     overflow-y: auto;
 }
@@ -185,6 +184,11 @@ td.active-cell {
     background: var(--bg-hover);
 }
 
+td.view-only-mode {
+    opacity: 0.7;
+    cursor: default;
+}
+
 /* Modals */
 .modal {
     position: fixed;
@@ -229,4 +233,9 @@ td.active-cell {
 
 .modal-actions .btn {
     flex: 1;
+}
+
+.highlight {
+    color: var(--primary);
+    font-weight: bold;
 }
