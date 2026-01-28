@@ -100,11 +100,39 @@ audio {
 
 .playlist div {
     cursor: pointer;
-    padding: 8px 5px;
+    padding: 0 5px;
     border-bottom: 1px solid #444;
     transition: background 0.2s, color 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }
 
+.playlist div span {
+    flex: 1;
+    margin: 8px 0;
+    text-overflow: ellipsis;
+    white-space: wrap;
+}
+
+.remove-btn:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+.remove-btn {
+    background: transparent;
+    height: 100%;
+    padding: 8px 5px;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s, color 0.2s;
+}
+ 
 .playlist div:last-child {
     border-bottom: none;
 }
@@ -114,7 +142,8 @@ audio {
     border-radius: 3px;
 }
 
-.playlist .active-audio {
+.playlist .active-audio,
+.playlist .active-pdf {
     background: #ffb14c;
     color: white;
     font-weight: bold;
@@ -168,12 +197,16 @@ audio {
     background: #f0f2f5;
 }
 
-#pdf-viewer {
+.pdf-viewer {
     width: 100%;
     height: 100%;
     border: none;
     background: white;
-    flex: 1;
+    display: none;
+}
+
+.pdf-viewer.active {
+    display: block;
 }
 
 @media (max-width: 1200px) {

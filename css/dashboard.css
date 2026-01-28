@@ -80,6 +80,10 @@ header {
     font-size: 0.7rem;
     cursor: pointer;
 }
+.pin-btn:hover {
+    background: var(--primary);
+    color: var(--bg-main);
+}
 
 .card.pinned .pin-btn {
     background: var(--primary);

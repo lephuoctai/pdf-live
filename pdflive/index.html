@@ -15,9 +15,10 @@
         <aside>
             <div class="toolbar">
                 <div>
-                    <label>1. Chọn PDF: </label><br>
-                    <input type="file" id="pdf-input" accept="application/pdf">
+                    <label>1. Chọn PDF (Tối đa 3): </label><br>
+                    <input type="file" id="pdf-input" accept="application/pdf" multiple>
                 </div>
+                <div class="playlist" id="pdf-list">Danh sách PDF đang trống!</div>
                 <div>
                     <label>2. Chọn nhiều Audio: </label><br>
                     <input type="file" id="audio-input" accept="audio/*" multiple>
@@ -36,7 +37,9 @@
             </div>
         </aside>
         <div class="main-content">
-            <iframe id="pdf-viewer" src="about:blank"></iframe>
+            <iframe id="pdf-viewer-0" class="pdf-viewer" src="about:blank"></iframe>
+            <iframe id="pdf-viewer-1" class="pdf-viewer" src="about:blank"></iframe>
+            <iframe id="pdf-viewer-2" class="pdf-viewer" src="about:blank"></iframe>
         </div>
     </div>
 </body>

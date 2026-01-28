@@ -33,3 +33,13 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* Button template */
+.btn-primary {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+.btn-primary:hover {
+    background: #e6953b;
+}

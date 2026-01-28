@@ -1,7 +1,7 @@
 
 const apps = [
-    { id: 'pdflive', name: 'PDF Live V3', desc: 'Xem PDF và nghe Audio đồng bộ, hỗ trợ trình chiếu tab cho Google Meet', url: './pdflive/index.html' },
-    { id: 'timevoting', name: 'Time Voting', desc: 'Công cụ thống nhất thời gian rảnh của nhóm', url: './timevoting/index.html' }
+    { id: 'pdflive', name: 'PDF Live V3.1', desc: 'Xem PDF và nghe Audio đồng bộ, hỗ trợ trình chiếu tab cho Google Meet', url: './pdflive/index.html' },
+    { id: 'timevoting', name: 'Time Voting V1', desc: 'Công cụ thống nhất thời gian rảnh của nhóm', url: './timevoting/index.html' }
 ];
 
 const searchInput = document.getElementById('search-input');
